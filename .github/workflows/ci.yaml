@@ -7,13 +7,28 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GO_VERSION: 1.16
+
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.20'
-    - name: Build
-      run: go build -v ./...
-    - name: Test
-      run: go test -v ./...
+      - uses: actions/checkout@v3
+
+      - name: Set up Go ${{ GO_VERSION }}
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ GO_VERSION }}
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test -v ./...
+      
+      - name: CI SUCCESFUL ok
+        if: success()
+        uses: rtCamp/action-slack-notify@v2
+        with:
+          status: 'passed'
+          text: 'GO CI Successfully'
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
